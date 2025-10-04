@@ -10,15 +10,15 @@ import cats.Functor
 package object signed extends SignedInstances
 
 trait SignedInstances {
-  implicit val functor: Functor[Signed] = new Functor[Signed] {
+  implicit val signedFunctor: Functor[Signed] = new Functor[Signed] {
     override def map[A, B](fa: Signed[A])(f: A => B) =
       Signed(fa.negative, f(fa.value))
   }
 
-  implicit def eq[A: Eq]: Eq[Signed[A]] =
+  implicit def signedEq[A: Eq]: Eq[Signed[A]] =
     new SignedEq[A]
 
-  implicit def bool[A: GenBool]: Bool[Signed[A]] = new SignedBool[A]
+  implicit def signedBool[A: GenBool]: Bool[Signed[A]] = new SignedBool[A]
 }
 
 class SignedEq[A](implicit A: Eq[A]) extends Eq[Signed[A]] {

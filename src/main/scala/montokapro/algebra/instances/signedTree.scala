@@ -4,10 +4,15 @@ package instances
 import montokapro.algebra.lattice.SignedTree
 
 import algebra.lattice.Bool
+import cats.Functor
 
 package object signedTree extends SignedTreeInstances
 
 trait SignedTreeInstances {
+  implicit val functor: Functor[SignedTree] = new Functor[SignedTree] {
+    override def map[A, B](fa: SignedTree[A])(f: A => B) = fa.map(f)
+  }
+
   implicit def bool[A]: Bool[SignedTree[A]] = new SignedTreeBool[A]
 }
 
