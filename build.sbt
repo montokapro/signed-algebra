@@ -1,9 +1,10 @@
-val scala2Version = "2.13.7"
-val scala3Version = "3.0.2"
+val scala2Version = "2.13.16"
+val scala3Version = "3.3.6"
 val scalaVersions = List(scala2Version, scala3Version)
 
-val catsVersion = "2.7.0"
-val scalaTestVersion = "3.2.10"
+val catsVersion = "2.13.0"
+val disciplineVersion = "2.3.0"
+val scalaTestVersion = "3.2.19"
 
 lazy val root = project
   .in(file("."))
@@ -20,6 +21,6 @@ lazy val root = project
       "org.typelevel" %% "cats-laws" % catsVersion % Test,
       "org.scalactic" %% "scalactic" % scalaTestVersion % Test,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
-      "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test
+      "org.typelevel" %% "discipline-scalatest" % disciplineVersion % Test
     )
   )
