@@ -2,6 +2,7 @@ package montokapro.algebra
 
 import montokapro.algebra.lattice._
 import montokapro.algebra.instances.signed._
+
 import algebra.instances.all._
 import algebra.laws.LogicLaws
 import cats.implicits._
@@ -25,7 +26,7 @@ class SignedSuite
       a <- Arbitrary.arbitrary[A]
     } yield Signed(b, a))
 
-  // signedEq implicits are needed for Scala 2 compilation
+  // scala 2 compilation hints
   implicit val signedEqInt: Eq[Signed[Int]] = new SignedEq[Int]
   implicit val signedEqString: Eq[Signed[String]] = new SignedEq[String]
   implicit val signedEqBoolean: Eq[Signed[Boolean]] = new SignedEq[Boolean]

@@ -2,6 +2,7 @@ package montokapro.algebra
 package instances
 
 import montokapro.algebra.lattice.Signed
+
 import algebra.lattice.{GenBool, Bool}
 import cats.kernel.Eq
 import cats.Functor
@@ -67,5 +68,6 @@ class SignedBool[A](implicit ev: GenBool[A]) extends Bool[Signed[A]] {
         Signed(true, ev.or(x.value, y.value))
     }
 
-  override def complement(x: Signed[A]): Signed[A] = Signed(!x.negative, x.value)
+  override def complement(x: Signed[A]): Signed[A] =
+    Signed(!x.negative, x.value)
 }
