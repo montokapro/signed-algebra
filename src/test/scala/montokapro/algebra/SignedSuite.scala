@@ -15,7 +15,7 @@ import org.typelevel.discipline.scalatest.FunSuiteDiscipline
 import montokapro.algebra.instances.SignedEq
 import cats.Eq
 
-class SignedSpec
+class SignedSuite
     extends AnyFunSuite
     with FunSuiteDiscipline
     with Configuration {
