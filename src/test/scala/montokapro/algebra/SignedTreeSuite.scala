@@ -7,7 +7,9 @@ import algebra.instances.all._
 import algebra.laws.LogicLaws
 import cats.Eq
 import cats.implicits._
+import cats.instances.all._
 import cats.laws.discipline.FunctorTests
+import cats.laws.discipline.UnorderedTraverseTests
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.prop.Configuration
 import org.scalacheck.{Arbitrary, Cogen, Gen}
@@ -38,6 +40,7 @@ class SignedTreeSuite
   implicit def signedTreeEq[A]: Eq[SignedTree[A]] = Eq.by(_.reduce())
 
   checkAll("SignedTree.FunctorLaws", FunctorTests[SignedTree].functor[Int, Int, String])
+  checkAll("SignedTree.UnorderedTraverseLaws", UnorderedTraverseTests[SignedTree].unorderedTraverse[Int, Double, String, Option, Option])
   checkAll("SignedTreeBoolean.LogicLaws", LogicLaws[SignedTree[Boolean]].bool)
   checkAll("SignedTreeInt.LogicLaws", LogicLaws[SignedTree[Int]].bool)
 }

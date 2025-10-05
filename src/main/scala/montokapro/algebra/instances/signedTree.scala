@@ -4,16 +4,22 @@ package instances
 import montokapro.algebra.lattice.SignedTree
 
 import algebra.lattice.Bool
-import cats.Functor
+import cats.{CommutativeApplicative, Functor, UnorderedTraverse}
+import cats.kernel.CommutativeMonoid
 
 package object signedTree extends SignedTreeInstances
 
 trait SignedTreeInstances {
-  implicit val functor: Functor[SignedTree] = new Functor[SignedTree] {
+  implicit val signedTreeFunctor: Functor[SignedTree] = new Functor[SignedTree] {
     override def map[A, B](fa: SignedTree[A])(f: A => B) = fa.map(f)
   }
 
-  implicit def bool[A]: Bool[SignedTree[A]] = new SignedTreeBool[A]
+  implicit val signedTreeTraverse: UnorderedTraverse[SignedTree] = new UnorderedTraverse[SignedTree] {
+    override def unorderedTraverse[F[_]: CommutativeApplicative, A, B](fa: SignedTree[A])(f: A => F[B]) = fa.unorderedTraverse(f)
+    override def unorderedFoldMap[A, B: CommutativeMonoid](fa: SignedTree[A])(f: A => B) = fa.unorderedFoldMap(f)
+  }
+
+  implicit def signedTreeBool[A]: Bool[SignedTree[A]] = new SignedTreeBool[A]
 }
 
 class SignedTreeBool[A] extends Bool[SignedTree[A]] {
