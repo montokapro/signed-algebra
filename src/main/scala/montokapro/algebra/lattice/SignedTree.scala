@@ -5,8 +5,9 @@ import montokapro.algebra.instances.signed._
 
 import algebra.instances.set._
 import algebra.lattice.{Bool, GenBool}
-import cats.CommutativeApplicative
+import cats.{CommutativeApplicative, Eval}
 import cats.kernel.CommutativeMonoid
+import cats.syntax.all._
 
 case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
   // Consider trampolining
@@ -21,8 +22,28 @@ case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
     imp(meetSemilattice.combineAll(negatives.map(_.reduce())), set)
   }
 
-  def map[B](f: A => B): SignedTree[B] = {
-    SignedTree(positives.map(f), negatives.map(_.map(f)))
+  def map[B](f: A => B) = {
+    def go(tree: SignedTree[A]): Eval[SignedTree[B]] = {
+      tree.negatives.unorderedTraverse(go).map(n =>
+        SignedTree(tree.positives.map(f), n)
+      )
+    }
+
+    go(this).value
+  }
+
+  def inverseFlatMap[B](f: A => SignedTree[B]): SignedTree[B] = {
+    def go(tree: SignedTree[A]): Eval[SignedTree[B]] = {
+      tree.negatives.unorderedTraverse(go).map(n =>
+        SignedTree(Set(), tree.positives.map(f) ++ n)
+      )
+    }
+
+    go(this).value
+  }
+
+  def flatMap[B](f: A => SignedTree[B]): SignedTree[B] = {
+    inverseFlatMap(a => SignedTree(Set(), Set(f(a))))
   }
 
   // Consider trampolining
