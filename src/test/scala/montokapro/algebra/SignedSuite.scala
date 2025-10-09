@@ -6,7 +6,7 @@ import montokapro.algebra.instances.signed._
 import algebra.instances.all._
 import algebra.laws.LogicLaws
 import cats.implicits._
-import cats.laws.discipline.FunctorTests
+import cats.laws.discipline.{FunctorTests, MonadTests}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.prop.Configuration
 import org.scalacheck.{Arbitrary, Gen}
@@ -33,6 +33,7 @@ class SignedSuite
   implicit val signedEqSetByte: Eq[Signed[Set[Byte]]] = new SignedEq[Set[Byte]]
 
   checkAll("Signed.FunctorLaws", FunctorTests[Signed].functor[Int, Int, String])
+  checkAll("Signed.MonadLaws", MonadTests[Signed].monad[Int, Int, String])
   checkAll("SignedBoolean.LogicLaws", LogicLaws[Signed[Boolean]].bool)
   checkAll("SignedSet.LogicLaws", LogicLaws[Signed[Set[Byte]]].bool)
 }
