@@ -1,5 +1,6 @@
 package montokapro.algebra
 
+import cats.Monad
 import io.circe.{Decoder, Encoder}
 import io.circe.parser._
 import io.circe.syntax._
@@ -48,50 +49,15 @@ class SignedTreeSpec extends AnyFunSpec {
     }
     it("1 [2] [3]") {
       assert(t(1, t(2), t(3)).reduce() == s(true))
-
     }
     it("1 [2 3] [[4]]") {
       assert(t(1, t(2, 3), t(t(4))).reduce() == s(true, 2, 3))
     }
-  }
-
-  describe("encode") {
-    it("") {
-      assert(t().reduce() == s(false))
-    }
-    it("[]") {
-      assert(t(t()).reduce() == s(true))
-    }
-    it("1") {
-      assert(t(1).reduce() == s(false, 1))
-    }
-    it("1 []") {
-      assert(t(1, t()).reduce() == s(true))
-    }
-    it("1 [[]]") {
-      assert(t(1, t(t())).reduce() == s(false, 1))
-    }
-    it("1 2 [[3 4]]") {
-      assert(t(1, 2, t(t(3, 4))).reduce() == s(false, 1, 2, 3, 4))
-    }
-    it("1 [1]") {
-      assert(t(1, t(1)).reduce() == s(true))
-    }
-    it("1 [2]") {
-      assert(t(1, t(2)).reduce() == s(true, 2))
-    }
-    it("1 [2] [3]") {
-      assert(t(1, t(2), t(3)).reduce() == s(true))
-
-    }
-    it("1 [2 3] [[4]]") {
+    it("[[1 2 3] [2 3 4]] [[3 4 5]]") {
       assert(t(1, t(2, 3), t(t(4))).reduce() == s(true, 2, 3))
     }
   }
 
-  // Consider
-  // https://circe.github.io/circe/codecs/testing.html
-  // https://github.com/circe/circe/blob/series/0.14.x/modules/testing/shared/src/main/scala/io/circe/testing/ParserTests.scala
   describe("circe") {
     import montokapro.algebra.instances.signedTree._
 
@@ -135,5 +101,61 @@ class SignedTreeSpec extends AnyFunSpec {
     it("[0]") {
       assert(decode[SignedTree[String]]("[0]").isLeft)
     }
+  }
+
+  it("disjunctive normal form") {
+    import montokapro.algebra.instances.signedTree._
+
+    val string: String = "[[[0, 1, 2], [1, 2, 3]], [[2, 3, 4]]]"
+
+    val tree: SignedTree[Set[Int]] =
+      SignedTree[Set[Int]](
+        Set(),
+        Set(
+          SignedTree(
+            Set(Set(0, 1, 2), Set(1, 2, 3)),
+            Set()
+          ),
+          SignedTree(
+            Set(Set(2, 3, 4)),
+            Set()
+          )
+        )
+      )
+
+    val set = Signed(false, Set(1, 2, 3, 4))
+
+    def go(a: Set[Int]): SignedTree[Int] = SignedTree(a, Set())
+
+    assert(tree.inverseFlatMap(go).reduce() == set)
+    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(set))
+    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.inverseFlatMap(go).reduce()))
+  }
+
+  it("nested") {
+    import montokapro.algebra.instances.signedTree._
+
+    val string: String = "[[0, 1, 2], [[1, 2, 3], [2, 3, 4]]]"
+
+    val tree: SignedTree[Set[Int]] = SignedTree[Set[Int]](
+      Set(Set(0, 1, 2)),
+      Set(
+        SignedTree(
+          Set(
+            Set(1, 2, 3),
+            Set(2, 3, 4)
+          ),
+          Set()
+        )
+      )
+    )
+
+    val set = Signed(true, Set(0, 1))
+
+    def go(a: Set[Int]): SignedTree[Int] = SignedTree(a, Set())
+
+    assert(tree.inverseFlatMap(go).reduce() == set)
+    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(set))
+    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.inverseFlatMap(go).reduce()))
   }
 }
