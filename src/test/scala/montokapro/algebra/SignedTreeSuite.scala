@@ -1,6 +1,5 @@
 package montokapro.algebra
 
-import montokapro.algebra.lattice._
 import montokapro.algebra.instances.all._
 
 import algebra.instances.all._
@@ -9,6 +8,8 @@ import cats.Eq
 import cats.implicits._
 import cats.instances.all._
 import cats.laws.discipline.{FunctorTests, MonadTests, UnorderedTraverseTests}
+import io.circe.testing.instances._
+import io.circe.testing.CodecTests
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.prop.Configuration
 import org.scalacheck.{Arbitrary, Cogen, Gen}
@@ -43,4 +44,5 @@ class SignedTreeSuite
   checkAll("SignedTree.UnorderedTraverseLaws", UnorderedTraverseTests[SignedTree].unorderedTraverse[Int, Double, String, Option, Option])
   checkAll("SignedTreeBoolean.LogicLaws", LogicLaws[SignedTree[Boolean]].bool)
   checkAll("SignedTreeInt.LogicLaws", LogicLaws[SignedTree[Int]].bool)
+  checkAll("SignedTreeInt.CodecLaws", CodecTests[SignedTree[Int]].codec)
 }

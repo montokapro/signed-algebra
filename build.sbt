@@ -3,6 +3,7 @@ val scala3Version = "3.3.6"
 val scalaVersions = List(scala2Version, scala3Version)
 
 val catsVersion = "2.13.0"
+val circeVersion = "0.14.15"
 val disciplineVersion = "2.3.0"
 val scalaTestVersion = "3.2.19"
 
@@ -14,13 +15,17 @@ lazy val root = project
     scalaVersion := scala3Version,
     crossScalaVersions := scalaVersions,
     libraryDependencies ++= Seq(
+      "io.circe" %% "circe-parser" % circeVersion,
       "org.typelevel" %% "algebra" % catsVersion,
       "org.typelevel" %% "cats-core" % catsVersion,
 
       "org.typelevel" %% "algebra-laws" % catsVersion % Test,
       "org.typelevel" %% "cats-laws" % catsVersion % Test,
+      "io.circe" %% "circe-testing" % circeVersion % Test,
       "org.scalactic" %% "scalactic" % scalaTestVersion % Test,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
       "org.typelevel" %% "discipline-scalatest" % disciplineVersion % Test
     )
   )
+
+fork := true

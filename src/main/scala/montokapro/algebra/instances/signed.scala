@@ -1,7 +1,7 @@
 package montokapro.algebra
 package instances
 
-import montokapro.algebra.lattice.Signed
+import montokapro.algebra.Signed
 
 import algebra.lattice.{GenBool, Bool}
 import cats.kernel.Eq
@@ -15,7 +15,7 @@ trait SignedInstances {
       Signed(fa.negative, f(fa.value))
   }
 
-  implicit val signedMonad: Monad[Signed] = new Monad {
+  implicit val signedMonad: Monad[Signed] = new Monad[Signed] {
     override def pure[A](a: A): Signed[A] = Signed(false, a)
 
     override def flatMap[A, B](fa: Signed[A])(f: A => Signed[B]): Signed[B] = {
@@ -23,7 +23,9 @@ trait SignedInstances {
       Signed(fa.negative != fb.negative, fb.value)
     }
 
-    override def tailRecM[A, B](a: A)(f: A => Signed[Either[A, B]]): Signed[B] = {
+    override def tailRecM[A, B](
+      a: A
+    )(f: A => Signed[Either[A, B]]): Signed[B] = {
       @annotation.tailrec
       def go(fa: Signed[A]): Signed[B] = {
         val fab = f(fa.value)

@@ -1,6 +1,5 @@
 package montokapro.algebra
 
-import montokapro.algebra.lattice._
 import montokapro.algebra.instances.signed._
 
 import algebra.instances.all._
