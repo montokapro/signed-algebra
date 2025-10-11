@@ -4,7 +4,7 @@ import montokapro.algebra.instances.signed._
 
 import algebra.instances.set._
 import algebra.lattice.{Bool, GenBool}
-import cats.{CommutativeApplicative, Eval}
+import cats.{Applicative, CommutativeApplicative, Eval, StackSafeMonad}
 import cats.kernel.CommutativeMonoid
 import cats.syntax.all._
 
@@ -21,11 +21,11 @@ case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
     imp(meetSemilattice.combineAll(negatives.map(_.reduce())), set)
   }
 
-  def map[B](f: A => B) = {
+  def map[B](f: A => B): SignedTree[B] = {
     def go(tree: SignedTree[A]): Eval[SignedTree[B]] = {
       tree.negatives
         .unorderedTraverse(go)
-        .map(n => SignedTree(tree.positives.map(f), n))
+        .map(t => SignedTree(tree.positives.map(f), t))
     }
 
     go(this).value
@@ -35,7 +35,7 @@ case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
     def go(tree: SignedTree[A]): Eval[SignedTree[B]] = {
       tree.negatives
         .unorderedTraverse(go)
-        .map(n => SignedTree(Set(), tree.positives.map(f) ++ n))
+        .map(t => SignedTree(Set(), tree.positives.map(f) ++ t))
     }
 
     go(this).value
@@ -45,8 +45,7 @@ case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
     inverseFlatMap(a => SignedTree(Set(), Set(f(a))))
   }
 
-  // Consider trampolining
-  def unorderedTraverse[F[_], B](
+  def unorderedTraverseDirectly[F[_], B](
     f: A => F[B]
   )(implicit applicative: CommutativeApplicative[F]): F[SignedTree[B]] = {
     val fPositive: F[Set[B]] = applicative.pure(Set.empty[B])
@@ -65,6 +64,29 @@ case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
       }
 
     applicative.map2(fPositives, fNegatives)(SignedTree.apply)
+  }
+
+  // Consider trampolining
+  def unorderedTraverse[F[_], B](
+    f: A => F[B]
+  )(implicit applicative: CommutativeApplicative[F]): F[SignedTree[B]] = applicative match {
+    case m: StackSafeMonad[F] => unorderedTraverseDirectly(f)
+    case _ => {
+      val evalApplicative: CommutativeApplicative[Eval] = CommutativeApplicative[Eval]
+
+      // Sadly, compose only returns an Applicative
+      val composedApplicative: Applicative[({ type L[Z] = Eval[F[Z]] })#L] = evalApplicative.compose(applicative)
+
+      val r: Eval[F[SignedTree[B]]] = unorderedTraverseDirectly[({ type L[Z] = Eval[F[Z]] })#L, B](
+        f.andThen(evalApplicative.pure)
+      )(
+        new CommutativeApplicative[({ type L[Z] = Eval[F[Z]] })#L] {
+          def pure[A](a: A): Eval[F[A]] = composedApplicative.pure(a)
+          def ap[A, B](ff: Eval[F[A => B]])(fa: Eval[F[A]]): Eval[F[B]] = composedApplicative.ap(ff)(fa)
+        }
+      )
+      r.value
+    }
   }
 
   // Consider trampolining
