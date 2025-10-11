@@ -40,7 +40,7 @@ class SignedTreeSuite
   implicit def signedTreeEq[A]: Eq[SignedTree[A]] = Eq.by(_.reduce())
 
   checkAll("SignedTree.FunctorLaws", FunctorTests[SignedTree].functor[Int, Int, String])
-  checkAll("SignedTree.MonadLaws", MonadTests[SignedTree].monad[Int, Int, String])
+  checkAll("SignedTree.MonadLaws", MonadTests[SignedTree].stackUnsafeMonad[Int, Int, String])
   checkAll("SignedTree.UnorderedTraverseLaws", UnorderedTraverseTests[SignedTree].unorderedTraverse[Int, Double, String, Option, Option])
   checkAll("SignedTreeBoolean.LogicLaws", LogicLaws[SignedTree[Boolean]].bool)
   checkAll("SignedTreeInt.LogicLaws", LogicLaws[SignedTree[Int]].bool)
