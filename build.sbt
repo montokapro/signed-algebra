@@ -5,6 +5,7 @@ val scalaVersions = List(scala2Version, scala3Version)
 val catsVersion = "2.13.0"
 val circeVersion = "0.14.15"
 val disciplineVersion = "2.3.0"
+//val kindProjectorVersion = "0.13.3"
 val scalaTestVersion = "3.2.19"
 
 lazy val root = project
@@ -18,14 +19,15 @@ lazy val root = project
       "io.circe" %% "circe-parser" % circeVersion,
       "org.typelevel" %% "algebra" % catsVersion,
       "org.typelevel" %% "cats-core" % catsVersion,
+      // "org.typelevel" %% "kind-projector" % kindProjectorVersion, //  cross CrossVersion.full,
 
-      "org.typelevel" %% "algebra-laws" % catsVersion % Test,
-      "org.typelevel" %% "cats-laws" % catsVersion % Test,
       "io.circe" %% "circe-testing" % circeVersion % Test,
       "org.scalactic" %% "scalactic" % scalaTestVersion % Test,
       "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
+      "org.typelevel" %% "algebra-laws" % catsVersion % Test,
+      "org.typelevel" %% "cats-laws" % catsVersion % Test,
       "org.typelevel" %% "discipline-scalatest" % disciplineVersion % Test
     )
   )
 
-fork := true
+// fork := true
