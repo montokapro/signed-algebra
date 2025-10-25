@@ -132,7 +132,67 @@ class SignedTreeSpec extends AnyFunSpec {
     assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.inverseFlatMap(go).reduce()))
   }
 
-  it("nested") {
+  it("nested flatMap") {
+    import montokapro.algebra.instances.signedTree._
+
+    val string: String = "[0, [1, [2]]]"
+
+    val tree: SignedTree[Set[Int]] =
+      SignedTree[Set[Int]](
+        Set(Set(0)),
+        Set(
+          SignedTree(
+            Set(Set(1)),
+            Set(
+              SignedTree(
+                Set(Set(2)),
+                Set()
+              )
+            )
+          )
+        )
+      )
+
+    val set = Signed(false, Set(0, 2))
+
+    def go(a: Set[Int]): SignedTree[Int] = SignedTree(a, Set())
+
+    assert(tree.flatMap(go).reduce() == set)
+    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(set))
+    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.flatMap(go).reduce()))
+  }
+
+  it("nested flatMap 2") {
+    import montokapro.algebra.instances.signedTree._
+
+    val string: String = "[0, 1, [1, 2, [2, 3]]]"
+
+    val tree: SignedTree[Set[Int]] =
+      SignedTree[Set[Int]](
+        Set(Set(0, 1)),
+        Set(
+          SignedTree(
+            Set(Set(1, 2)),
+            Set(
+              SignedTree(
+                Set(Set(2, 3)),
+                Set()
+              )
+            )
+          )
+        )
+      )
+
+    val set = Signed(false, Set(0, 1, 3))
+
+    def go(a: Set[Int]): SignedTree[Int] = SignedTree(a, Set())
+
+    assert(tree.flatMap(go).reduce() == set)
+    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(set))
+    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.flatMap(go).reduce()))
+  }
+
+  it("nested inverseFlatMap") {
     import montokapro.algebra.instances.signedTree._
 
     val string: String = "[[0, 1, 2], [[1, 2, 3], [2, 3, 4]]]"
