@@ -8,10 +8,13 @@ import io.circe.syntax._
 import instances.all._
 
 implicit val signedIntEncoder: Encoder[Signed[Set[Int]]] = Encoder.instance[Signed[Set[Int]]] { a =>
-  Json.obj(
-    ("negative", a.negative.asJson),
-    ("value", a.value.asJson)
-  )
+  val value = a.value.asJson
+
+  if (a.negative) {
+    Json.arr(value)
+  } else {
+    value
+  }
 }
 
 // Example

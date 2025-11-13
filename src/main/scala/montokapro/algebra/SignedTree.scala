@@ -69,25 +69,30 @@ case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
   // Consider trampolining
   def unorderedTraverse[F[_], B](
     f: A => F[B]
-  )(implicit applicative: CommutativeApplicative[F]): F[SignedTree[B]] = applicative match {
-    case m: StackSafeMonad[F] => unorderedTraverseDirectly(f)
-    case _ => {
-      val evalApplicative: CommutativeApplicative[Eval] = CommutativeApplicative[Eval]
+  )(implicit applicative: CommutativeApplicative[F]): F[SignedTree[B]] =
+    applicative match {
+      case m: StackSafeMonad[F] => unorderedTraverseDirectly(f)
+      case _ => {
+        val evalApplicative: CommutativeApplicative[Eval] =
+          CommutativeApplicative[Eval]
 
-      // Sadly, compose only returns an Applicative
-      val composedApplicative: Applicative[({ type L[Z] = Eval[F[Z]] })#L] = evalApplicative.compose(applicative)
+        // Sadly, compose only returns an Applicative
+        val composedApplicative: Applicative[({ type L[Z] = Eval[F[Z]] })#L] =
+          evalApplicative.compose(applicative)
 
-      val r: Eval[F[SignedTree[B]]] = unorderedTraverseDirectly[({ type L[Z] = Eval[F[Z]] })#L, B](
-        f.andThen(evalApplicative.pure)
-      )(
-        new CommutativeApplicative[({ type L[Z] = Eval[F[Z]] })#L] {
-          def pure[A](a: A): Eval[F[A]] = composedApplicative.pure(a)
-          def ap[A, B](ff: Eval[F[A => B]])(fa: Eval[F[A]]): Eval[F[B]] = composedApplicative.ap(ff)(fa)
-        }
-      )
-      r.value
+        val r: Eval[F[SignedTree[B]]] =
+          unorderedTraverseDirectly[({ type L[Z] = Eval[F[Z]] })#L, B](
+            f.andThen(evalApplicative.pure)
+          )(
+            new CommutativeApplicative[({ type L[Z] = Eval[F[Z]] })#L] {
+              def pure[A](a: A): Eval[F[A]] = composedApplicative.pure(a)
+              def ap[A, B](ff: Eval[F[A => B]])(fa: Eval[F[A]]): Eval[F[B]] =
+                composedApplicative.ap(ff)(fa)
+            }
+          )
+        r.value
+      }
     }
-  }
 
   // Consider trampolining
   def unorderedFoldMap[B](
