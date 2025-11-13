@@ -4,7 +4,6 @@ import cats.Monad
 import io.circe.{Decoder, Encoder}
 import io.circe.parser._
 import io.circe.syntax._
-import montokapro.algebra._
 import org.scalatest.funspec.AnyFunSpec
 
 class SignedTreeSpec extends AnyFunSpec {
