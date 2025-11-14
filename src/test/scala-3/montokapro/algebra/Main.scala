@@ -7,16 +7,6 @@ import io.circe.syntax._
 
 import instances.all._
 
-implicit val signedIntEncoder: Encoder[Signed[Set[Int]]] = Encoder.instance[Signed[Set[Int]]] { a =>
-  val value = a.value.asJson
-
-  if (a.negative) {
-    Json.arr(value)
-  } else {
-    value
-  }
-}
-
 // The following example
 //
 // > sbt
@@ -43,6 +33,6 @@ implicit val signedIntEncoder: Encoder[Signed[Set[Int]]] = Encoder.instance[Sign
 @main def reduce(s: String) = println(
   decode[SignedTree[Int]](s) match {
     case Left(e) => e
-    case Right(tree) => tree.reduce().asJson
+    case Right(tree) => SignedTree.fromSignedSet(tree.reduce()).asJson
   }
 )
