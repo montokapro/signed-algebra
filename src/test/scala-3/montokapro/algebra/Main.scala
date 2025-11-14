@@ -33,6 +33,6 @@ import instances.all._
 @main def reduce(s: String) = println(
   decode[SignedTree[Int]](s) match {
     case Left(e) => e
-    case Right(tree) => SignedTree.fromSignedSet(tree.reduce()).asJson
+    case Right(tree) => tree.reduce().asJson
   }
 )

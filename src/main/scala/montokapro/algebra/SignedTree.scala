@@ -10,7 +10,7 @@ import cats.syntax.all._
 
 case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
   // Consider trampolining
-  def reduce(): Signed[Set[A]] = {
+  def toSignedSet(): Signed[Set[A]] = {
     // scala 2 compilation hint
     val setGenBool: GenBool[Set[A]] = GenBool[Set[A]]
     val signedSetBool: Bool[Signed[Set[A]]] = signedBool(setGenBool)
@@ -18,7 +18,11 @@ case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
     import signedSetBool._
 
     val set = Signed[Set[A]](false, positives)
-    imp(meetSemilattice.combineAll(negatives.map(_.reduce())), set)
+    imp(meetSemilattice.combineAll(negatives.map(_.toSignedSet())), set)
+  }
+
+  def reduce(): SignedTree[A] = {
+    SignedTree.fromSignedSet(toSignedSet())
   }
 
   def map[B](f: A => B): SignedTree[B] = {

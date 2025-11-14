@@ -23,37 +23,48 @@ class SignedTreeSpec extends AnyFunSpec {
 
   describe("reduce") {
     it("") {
-      assert(t().reduce() == s(false))
+      assert(t().toSignedSet() == s(false))
+      assert(t().reduce() == t())
     }
     it("[]") {
-      assert(t(t()).reduce() == s(true))
+      assert(t(t()).toSignedSet() == s(true))
+      assert(t(t()).reduce() == t(t()))
     }
     it("1") {
-      assert(t(1).reduce() == s(false, 1))
+      assert(t(1).toSignedSet() == s(false, 1))
+      assert(t(1).reduce() == t(1))
     }
     it("1 []") {
-      assert(t(1, t()).reduce() == s(true))
+      assert(t(1, t()).toSignedSet() == s(true))
+      assert(t(1, t()).reduce() == t(t()))
     }
     it("1 [[]]") {
-      assert(t(1, t(t())).reduce() == s(false, 1))
+      assert(t(1, t(t())).toSignedSet() == s(false, 1))
+      assert(t(1, t(t())).reduce() == t(1))
     }
     it("1 2 [[3 4]]") {
-      assert(t(1, 2, t(t(3, 4))).reduce() == s(false, 1, 2, 3, 4))
+      assert(t(1, 2, t(t(3, 4))).toSignedSet() == s(false, 1, 2, 3, 4))
+      assert(t(1, 2, t(t(3, 4))).reduce() == t(1, 2, 3, 4))
     }
     it("1 [1]") {
-      assert(t(1, t(1)).reduce() == s(true))
+      assert(t(1, t(1)).toSignedSet() == s(true))
+      assert(t(1, t(1)).reduce() == t(t()))
     }
     it("1 [2]") {
-      assert(t(1, t(2)).reduce() == s(true, 2))
+      assert(t(1, t(2)).toSignedSet() == s(true, 2))
+      assert(t(1, t(2)).reduce() == t(t(2)))
     }
     it("1 [2] [3]") {
-      assert(t(1, t(2), t(3)).reduce() == s(true))
+      assert(t(1, t(2), t(3)).toSignedSet() == s(true))
+      assert(t(1, t(2), t(3)).reduce() == t(t()))
     }
     it("1 [2 3] [[4]]") {
-      assert(t(1, t(2, 3), t(t(4))).reduce() == s(true, 2, 3))
+      assert(t(1, t(2, 3), t(t(4))).toSignedSet() == s(true, 2, 3))
+      assert(t(1, t(2, 3), t(t(4))).reduce() == t(t(2, 3)))
     }
     it("[[1 2 3] [2 3 4]] [[3 4 5]]") {
-      assert(t(1, t(2, 3), t(t(4))).reduce() == s(true, 2, 3))
+      assert(t(1, t(2, 3), t(t(4))).toSignedSet() == s(true, 2, 3))
+      assert(t(1, t(2, 3), t(t(4))).reduce() == t(t(2, 3)))
     }
   }
 
@@ -126,9 +137,9 @@ class SignedTreeSpec extends AnyFunSpec {
 
     def go(a: Set[Int]): SignedTree[Int] = SignedTree(a, Set())
 
-    assert(tree.inverseFlatMap(go).reduce() == set)
-    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(set))
-    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.inverseFlatMap(go).reduce()))
+    assert(tree.inverseFlatMap(go).toSignedSet() == set)
+    assert(decode[SignedTree[Int]](string).map(_.toSignedSet()) == Right(set))
+    assert(decode[SignedTree[Int]](string).map(_.toSignedSet()) == Right(tree.inverseFlatMap(go).toSignedSet()))
   }
 
   it("nested flatMap") {
@@ -156,9 +167,9 @@ class SignedTreeSpec extends AnyFunSpec {
 
     def go(a: Set[Int]): SignedTree[Int] = SignedTree(a, Set())
 
-    assert(tree.flatMap(go).reduce() == set)
-    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(set))
-    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.flatMap(go).reduce()))
+    assert(tree.flatMap(go).toSignedSet() == set)
+    assert(decode[SignedTree[Int]](string).map(_.toSignedSet()) == Right(set))
+    assert(decode[SignedTree[Int]](string).map(_.toSignedSet()) == Right(tree.flatMap(go).toSignedSet()))
   }
 
   it("nested flatMap 2") {
@@ -186,9 +197,9 @@ class SignedTreeSpec extends AnyFunSpec {
 
     def go(a: Set[Int]): SignedTree[Int] = SignedTree(a, Set())
 
-    assert(tree.flatMap(go).reduce() == set)
-    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(set))
-    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.flatMap(go).reduce()))
+    assert(tree.flatMap(go).toSignedSet() == set)
+    assert(decode[SignedTree[Int]](string).map(_.toSignedSet()) == Right(set))
+    assert(decode[SignedTree[Int]](string).map(_.toSignedSet()) == Right(tree.flatMap(go).toSignedSet()))
   }
 
   it("nested inverseFlatMap") {
@@ -213,8 +224,8 @@ class SignedTreeSpec extends AnyFunSpec {
 
     def go(a: Set[Int]): SignedTree[Int] = SignedTree(a, Set())
 
-    assert(tree.inverseFlatMap(go).reduce() == set)
-    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(set))
-    assert(decode[SignedTree[Int]](string).map(_.reduce()) == Right(tree.inverseFlatMap(go).reduce()))
+    assert(tree.inverseFlatMap(go).toSignedSet() == set)
+    assert(decode[SignedTree[Int]](string).map(_.toSignedSet()) == Right(set))
+    assert(decode[SignedTree[Int]](string).map(_.toSignedSet()) == Right(tree.inverseFlatMap(go).toSignedSet()))
   }
 }

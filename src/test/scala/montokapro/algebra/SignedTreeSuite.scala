@@ -37,7 +37,7 @@ class SignedTreeSuite
 
   implicit def signedSetEq[A]: Eq[Signed[Set[A]]] =
     Eq.fromUniversalEquals[Signed[Set[A]]]
-  implicit def signedTreeEq[A]: Eq[SignedTree[A]] = Eq.by(_.reduce())
+  implicit def signedTreeEq[A]: Eq[SignedTree[A]] = Eq.by(_.toSignedSet())
 
   checkAll("SignedTree.FunctorLaws", FunctorTests[SignedTree].functor[Int, Int, String])
   checkAll("SignedTree.MonadLaws", MonadTests[SignedTree].stackUnsafeMonad[Int, Int, String])
