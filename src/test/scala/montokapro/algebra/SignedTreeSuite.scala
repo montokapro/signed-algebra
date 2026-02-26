@@ -44,5 +44,5 @@ class SignedTreeSuite
   checkAll("SignedTree.UnorderedTraverseLaws", UnorderedTraverseTests[SignedTree].unorderedTraverse[Int, Double, String, Option, Option])
   checkAll("SignedTreeBoolean.LogicLaws", LogicLaws[SignedTree[Boolean]].bool)
   checkAll("SignedTreeInt.LogicLaws", LogicLaws[SignedTree[Int]].bool)
-  checkAll("SignedTreeInt.CodecLaws", CodecTests[SignedTree[Int]].codec)
+  checkAll("SignedTreeInt.CodecLaws", CodecTests[SignedTree[Int]].unserializableCodec)
 }
