@@ -3,4 +3,7 @@ package instances
 
 package object all extends AllInstances
 
-trait AllInstances extends SignedInstances with SignedTreeInstances
+trait AllInstances
+    extends SignedInstances
+    with SignedTreeInstances
+    with TreeInstances

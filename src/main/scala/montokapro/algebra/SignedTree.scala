@@ -112,10 +112,10 @@ case class SignedTree[A](positives: Set[A], negatives: Set[SignedTree[A]]) {
 
 object SignedTree {
   def fromSignedSet[A](set: Signed[Set[A]]): SignedTree[A] = {
-    val tree = SignedTree(set.value, Set.empty)
+    val tree = SignedTree(set.value, Set.empty[SignedTree[A]])
 
     if (set.negative) {
-      SignedTree(Set.empty, Set(tree))
+      SignedTree(Set.empty[A], Set(tree))
     } else {
       tree
     }
